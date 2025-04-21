@@ -1,0 +1,901 @@
+package grocerymanagementprj;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+public class GroceryManagementProject {
+
+ private JFrame mainFrame;
+ 
+ private JPanel loginPanel;
+ private JPanel mainPanel;
+ private JPanel productPanel;
+ private JPanel inventoryPanel;
+ private JPanel salesPanel;
+ private JPanel reportPanel;
+ 
+ private JTextField productIdField, productNameField, productPriceField, productQuantityField;
+ private JTable productTable;
+ private DefaultTableModel productTableModel;
+ 
+ private JTextField saleProductIdField, saleQuantityField;
+ private JTable cartTable;
+ private DefaultTableModel cartTableModel;
+ private JLabel totalAmountLabel;
+ private double totalAmount = 0.0;
+ 
+ private JTextField usernameField;
+ private JPasswordField passwordField;
+ 
+ private ArrayList<Product> products = new ArrayList<>();
+ private Map<String, User> users = new HashMap<>();
+ private ArrayList<Sale> sales = new ArrayList<>();
+ 
+ public GroceryManagementProject() {
+	 
+	 //USERS EITHER STAFF/ADMIM
+     users.put("admin", new User("admin", "admin123", "Administrator"));
+     users.put("staff", new User("staff", "staff123", "Staff"));
+     
+     //PRE DEFINED PRODUCTS/LIST OF ITEMS
+     products.add(new Product("P01", "Rice", 110, 100));
+     products.add(new Product("P02", "Beans", 40, 150));
+     products.add(new Product("P03", "Milk",  55, 200));
+     products.add(new Product("P05", "Apple", 80, 100));
+     products.add(new Product("P06", "Banana", 45, 80));
+     products.add(new Product("P07", "Watermelon", 130,70));
+     products.add(new Product("P08", "Potato", 30, 130));
+     products.add(new Product("P09", "Onions", 43, 150));
+     products.add(new Product("P10", "Tomato", 51, 200));
+     products.add(new Product("P11", "Pulses", 120, 300));
+     
+     initialize();
+ }
+ 
+ private void initialize() {
+     mainFrame = new JFrame("Welcome To Our Grocery Management System");
+     mainFrame.getContentPane().setBackground(new Color(240, 248, 255));
+     mainFrame.setSize(800, 600);
+     mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+     mainFrame.getContentPane().setLayout(new CardLayout());
+     mainFrame.getContentPane().setBackground(new Color(240, 248, 255)); // Light blue background
+     
+     createLoginPanel();
+     createMainPanel();
+     createProductPanel();
+     createInventoryPanel();
+     createSalesPanel();
+     createReportPanel();
+     
+     mainFrame.getContentPane().add(loginPanel, "login");
+     	    
+     	    	    // Login Button
+   
+     	    	    JButton loginButton = new JButton("Login");
+     	    	   loginButton.setBackground(new Color(60, 179, 113)); // Green
+     	    	  loginButton.setForeground(new Color(0, 0, 0));
+     	    	  loginButton.setFont(new Font("Dialog", Font.BOLD, 16));
+     	    	    GridBagConstraints gbcLoginButton = new GridBagConstraints();
+     	    	    gbcLoginButton.gridx = 5;
+     	    	    gbcLoginButton.gridy = 5;
+     	    	    gbcLoginButton.insets = new Insets(10, 10, 10, 10);
+     	    	    loginPanel.add(loginButton, gbcLoginButton);
+     	    
+     	    	    // Login Action
+     	    	   loginButton.addActionListener(e -> {
+     	    		    String enteredUsername = usernameField.getText().trim();
+     	    		    String enteredPassword = new String(passwordField.getPassword()); // Assuming passwordField is a JPasswordField
+
+     	    		    if (users.containsKey(enteredUsername) && users.get(enteredUsername).getPassword().equals(enteredPassword)) {
+     	    		        JOptionPane.showMessageDialog(mainFrame, "Login successful!");
+     	    		        CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+     	    		        cl.show(mainFrame.getContentPane(), "main");
+     	    		    } else {
+     	    		        JOptionPane.showMessageDialog(mainFrame, "Invalid username or password!", "Error", JOptionPane.ERROR_MESSAGE);
+     	    		    }
+     	    		});
+
+     mainFrame.getContentPane().add(mainPanel, "main");
+     mainFrame.getContentPane().add(productPanel, "product");
+     mainFrame.getContentPane().add(inventoryPanel, "inventory");
+     mainFrame.getContentPane().add(salesPanel, "sales");
+     mainFrame.getContentPane().add(reportPanel, "report");
+     
+     CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+     cl.show(mainFrame.getContentPane(), "login");
+     
+     mainFrame.setVisible(true);
+ }
+ 
+ private void createLoginPanel() {
+	    loginPanel = new JPanel();
+	    loginPanel.setLayout(new GridBagLayout());
+        loginPanel.setBackground(new Color(255, 250, 240));
+loginPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
+
+	    	    // Title Label
+
+	    	    JLabel titleLabel = new JLabel("Welcome To Our Grocery Management System");
+	    	    titleLabel.setForeground(new Color(0, 0, 0)); // Black
+	    	    titleLabel.setFont(new Font("Serif", Font.BOLD | Font.ITALIC, 24));
+	    	    titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+	    	  
+	    	    titleLabel.setFont(new Font("Serif", Font.BOLD | Font.ITALIC, 24));
+	    	 
+	    	    GridBagConstraints gbcTitle = new GridBagConstraints();
+	    	    gbcTitle.gridx = 1;
+	    	    gbcTitle.gridy = 0;
+	    	    gbcTitle.gridwidth = 9;
+	    	    gbcTitle.insets = new Insets(10, 10, 10, 10);
+	    	    loginPanel.add(titleLabel, gbcTitle);
+	    
+	    JLabel lblNewLabel = new JLabel("Please Login To Continue");
+	    lblNewLabel.setForeground(new Color(0, 0, 0)); // Black
+	    lblNewLabel.setFont(new Font("Arial", Font.BOLD, 17));
+	   
+	    
+	    GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+	    
+	    gbc_lblNewLabel.gridwidth = 9;
+	    gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
+	    gbc_lblNewLabel.gridx = 1;
+	    gbc_lblNewLabel.gridy = 1;
+	    loginPanel.add(lblNewLabel, gbc_lblNewLabel);
+	    	    
+	    	    	    // Username Label
+	    	    	    JLabel usernameLabel = new JLabel("Username:");
+	    	    	    usernameLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+	    	    	    GridBagConstraints gbcUsernameLabel = new GridBagConstraints();
+	    	    	    usernameLabel.setForeground(new Color(0, 0, 0)); // Black
+	    	    	    gbcUsernameLabel.gridx = 3;
+	    	    	    gbcUsernameLabel.gridy = 3;
+	    	    	    gbcUsernameLabel.insets = new Insets(5, 5, 5, 5);
+	    	    	    loginPanel.add(usernameLabel, gbcUsernameLabel);
+	    	    	    
+	    	    	    	    // Username Field
+	    	    	    	    usernameField = new JTextField(15);
+	    	    	    	    GridBagConstraints gbcUsernameField = new GridBagConstraints();
+	    	    	    	    usernameField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+	    	    	    	    usernameField.setForeground(Color.BLACK);
+	    	    	    	    usernameField.setBackground(Color.WHITE);
+	    	    	    	    usernameField.setToolTipText("Enter your username");
+
+	    	    	    	    
+	    	    	    	    gbcUsernameField.gridx = 5;
+	    	    	    	    gbcUsernameField.gridy = 3;
+	    	    	    	    gbcUsernameField.insets = new Insets(5, 5, 5, 5);
+	    	    	    	    loginPanel.add(usernameField, gbcUsernameField);
+	    	    	    	    String username = usernameField.getText();
+	    	    
+	    	    	    // Password Label
+	    	    	    JLabel passwordLabel = new JLabel("Password:");
+	    	    	    passwordLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+	    	    	    
+	    	    	    GridBagConstraints gbcPasswordLabel = new GridBagConstraints();
+	    	    	    passwordLabel.setForeground(new Color(0, 0, 0)); // Black
+	    	    	    gbcPasswordLabel.gridx = 3;
+	    	    	    gbcPasswordLabel.gridy = 4;
+	    	    	    gbcPasswordLabel.insets = new Insets(5, 5, 5, 5);
+	    	    	    loginPanel.add(passwordLabel, gbcPasswordLabel);
+	    
+	    	    // Password Field
+	    	    passwordField = new JPasswordField(15);
+	    	    GridBagConstraints gbcPasswordField = new GridBagConstraints();
+	    	    passwordField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+	    	    passwordField.setForeground(Color.BLACK);
+	    	    passwordField.setBackground(Color.WHITE);
+	    	    passwordField.setToolTipText("Enter your password");
+	    	    gbcPasswordField.gridx = 5;
+	    	    gbcPasswordField.gridy = 4;
+	    	    gbcPasswordField.insets = new Insets(5, 5, 5, 5);
+	    	    loginPanel.add(passwordField, gbcPasswordField);
+	    	    String password = new String(passwordField.getPassword());
+            
+	}
+
+
+ 
+ private void createMainPanel() {
+     mainPanel = new JPanel();
+     mainPanel.setLayout(new BorderLayout());
+     
+     JLabel titleLabel = new JLabel("Main Menu", JLabel.CENTER);
+     titleLabel.setFont(new Font("Arial", Font.BOLD, 25));
+     mainPanel.add(titleLabel, BorderLayout.NORTH);
+     
+     JPanel buttonPanel = new JPanel();
+     buttonPanel.setLayout(new GridLayout(2, 2, 20, 20));
+     buttonPanel.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
+     
+     JButton productButton = new JButton("Product Management");
+     productButton.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+     JButton inventoryButton = new JButton("Inventory");
+     inventoryButton.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+     JButton salesButton = new JButton("Sales");
+     salesButton.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+     JButton reportButton = new JButton("Reports");
+     reportButton.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+     JButton logoutButton = new JButton("Logout");
+     logoutButton.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+     
+     buttonPanel.add(productButton);
+     buttonPanel.add(inventoryButton);
+     buttonPanel.add(salesButton);
+     buttonPanel.add(reportButton);
+     
+     mainPanel.add(buttonPanel, BorderLayout.CENTER);
+     mainPanel.add(logoutButton, BorderLayout.SOUTH);
+     
+     productButton.addActionListener(e -> {
+         updateProductTable();
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "product");
+         mainPanel.setBackground(new Color(255, 248, 220));
+titleLabel.setForeground(new Color(0, 0, 0));
+titleLabel.setFont(new Font("Georgia", Font.BOLD, 30));
+buttonPanel.setBackground(new Color(255, 248, 220));
+productButton.setBackground(new Color(100, 149, 237));
+productButton.setForeground(new Color(0, 0, 0));
+inventoryButton.setBackground(new Color(244, 164, 96));
+inventoryButton.setForeground(new Color(0, 0, 0));
+salesButton.setBackground(new Color(60, 179, 113));
+salesButton.setForeground(new Color(0, 0, 0));
+reportButton.setBackground(new Color(255, 99, 71));
+reportButton.setForeground(new Color(0, 0, 0));
+logoutButton.setBackground(new Color(220, 20, 60));
+logoutButton.setForeground(new Color(0, 0, 0));
+     });
+     
+     inventoryButton.addActionListener(e -> {
+         updateInventoryTable();
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "inventory");
+     });
+     
+     salesButton.addActionListener(e -> {
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "sales");
+     });
+     
+     reportButton.addActionListener(e -> {
+         updateReportTable();
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "report");
+     });
+     
+     logoutButton.addActionListener(e -> {
+         usernameField.setText("");
+         passwordField.setText("");
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "login");
+     });
+ }
+ 
+ private void createProductPanel() {
+     productPanel = new JPanel();
+     productPanel.setLayout(new BorderLayout());
+     productPanel.setBackground(new Color(245, 255, 250));
+
+     
+     JLabel titleLabel = new JLabel("Product Management", JLabel.CENTER);
+     titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+     productPanel.add(titleLabel, BorderLayout.NORTH);
+     
+     // Input form panel
+     JPanel formPanel = new JPanel();
+     formPanel.setLayout(new GridLayout(5, 2, 10, 10));
+     formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+     formPanel.setBackground(new Color(245, 255, 250));
+    
+     
+     JLabel label = new JLabel("Product ID:");
+     label.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+     formPanel.add(label);
+     productIdField = new JTextField();
+     formPanel.add(productIdField);
+     
+     JLabel label_1 = new JLabel("Product Name:");
+     label_1.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+     formPanel.add(label_1);
+     productNameField = new JTextField();
+     formPanel.add(productNameField);
+     
+     JLabel label_2 = new JLabel("Price:");
+     label_2.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+     formPanel.add(label_2);
+     productPriceField = new JTextField();
+     formPanel.add(productPriceField);
+     
+     JLabel label_3 = new JLabel("Quantity:");
+     label_3.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+     formPanel.add(label_3);
+     productQuantityField = new JTextField();
+     formPanel.add(productQuantityField);
+     
+     JPanel buttonPanel = new JPanel();
+     JButton addButton = new JButton("Add");
+     addButton.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+     JButton updateButton = new JButton("Update");
+     updateButton.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+     JButton deleteButton = new JButton("Delete");
+     deleteButton.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+     JButton clearButton = new JButton("Clear");
+     clearButton.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+     buttonPanel.add(addButton);
+     buttonPanel.add(updateButton);
+     buttonPanel.add(deleteButton);
+     buttonPanel.add(clearButton);
+     formPanel.add(buttonPanel);
+     
+     // Table panel
+     JPanel tablePanel = new JPanel();
+     tablePanel.setLayout(new BorderLayout());
+     tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+     tablePanel.setBackground(new Color(245, 255, 250));
+     
+     // Create product table model
+     productTableModel = new DefaultTableModel() {
+         @Override
+         public boolean isCellEditable(int row, int column) {
+             return false;
+         }
+     };
+     productTableModel.addColumn("ID");
+     productTableModel.addColumn("Name");
+     productTableModel.addColumn("Price in(₹)");
+     productTableModel.addColumn("Quantity in(KG)");
+     
+     // Create table
+     productTable = new JTable(productTableModel);
+     JScrollPane scrollPane = new JScrollPane(productTable);
+     tablePanel.add(scrollPane, BorderLayout.CENTER);
+     
+     // Back button
+     JButton backButton = new JButton("Back to Main Menu");
+     backButton.setFont(new Font("Lucida Grande", Font.BOLD, 18));
+     
+     // Add components to panel
+     JPanel centerPanel = new JPanel(new BorderLayout());
+     centerPanel.add(formPanel, BorderLayout.NORTH);
+     centerPanel.add(tablePanel, BorderLayout.CENTER);
+     
+     productPanel.add(centerPanel, BorderLayout.CENTER);
+     productPanel.add(backButton, BorderLayout.SOUTH);
+     
+     // Add action listeners
+     addButton.addActionListener(e -> addProduct());
+     updateButton.addActionListener(e -> updateProduct());
+     deleteButton.addActionListener(e -> deleteProduct());
+     clearButton.addActionListener(e -> clearProductFields());
+     
+     productTable.addMouseListener(new MouseAdapter() {
+         @Override
+         public void mouseClicked(MouseEvent e) {
+             int selectedRow = productTable.getSelectedRow();
+             if (selectedRow >= 0) {
+                 productIdField.setText(productTableModel.getValueAt(selectedRow, 0).toString());
+                 productNameField.setText(productTableModel.getValueAt(selectedRow, 1).toString());
+                 productPriceField.setText(productTableModel.getValueAt(selectedRow, 2).toString());
+                 productQuantityField.setText(productTableModel.getValueAt(selectedRow, 3).toString());
+
+                 productTable.getTableHeader().setFont(new Font("Verdana", Font.BOLD, 14));
+productTable.getTableHeader().setBackground(new Color(70, 130, 180));
+productTable.getTableHeader().setForeground(Color.WHITE);
+productTable.setRowHeight(25);
+
+             }
+         }
+     });
+     
+     backButton.addActionListener(e -> {
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "main");
+     });
+ }
+ 
+ private void createInventoryPanel() {
+     inventoryPanel = new JPanel();
+     inventoryPanel.setLayout(new BorderLayout());
+     
+     JLabel titleLabel = new JLabel("Inventory Management", JLabel.CENTER);
+     titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+     inventoryPanel.add(titleLabel, BorderLayout.NORTH);
+     
+     // Create table model
+     DefaultTableModel inventoryTableModel = new DefaultTableModel() {
+         @Override
+         public boolean isCellEditable(int row, int column) {
+             return false;
+         }
+     };
+     inventoryTableModel.addColumn("ID");
+     inventoryTableModel.addColumn("Name");
+     inventoryTableModel.addColumn("Quantity");
+     inventoryTableModel.addColumn("Status");
+     
+     // Create table
+     JTable inventoryTable = new JTable(inventoryTableModel);
+     JScrollPane scrollPane = new JScrollPane(inventoryTable);
+     inventoryPanel.add(scrollPane, BorderLayout.CENTER);
+     
+     // Back button
+     JButton backButton = new JButton("Back to Main Menu");
+     backButton.setFont(new Font("Lucida Grande", Font.BOLD, 18));
+     inventoryPanel.add(backButton, BorderLayout.SOUTH);
+     
+     // Action listeners
+     backButton.addActionListener(e -> {
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "main");
+     });
+ }
+ 
+ private void createSalesPanel() {
+     salesPanel = new JPanel();
+     salesPanel.setLayout(new BorderLayout());
+     usernameField.setToolTipText("Enter your username");
+passwordField.setToolTipText("Enter your password");
+productIdField.setToolTipText("Enter Product ID");
+productNameField.setToolTipText("Enter Product Name");
+productPriceField.setToolTipText("Enter Product Price");
+productQuantityField.setToolTipText("Enter Product Quantity");
+     JLabel titleLabel = new JLabel("Sales Management", JLabel.CENTER);
+     titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+     salesPanel.add(titleLabel, BorderLayout.NORTH);
+     
+     // Input panel
+     JPanel inputPanel = new JPanel();
+     inputPanel.setLayout(new GridLayout(3, 2, 10, 10));
+     inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+     
+     JLabel label = new JLabel("Product ID:");
+     label.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
+     inputPanel.add(label);
+     saleProductIdField = new JTextField();
+     inputPanel.add(saleProductIdField);
+     
+     JLabel label_1 = new JLabel("Quantity:");
+     label_1.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
+     inputPanel.add(label_1);
+     saleQuantityField = new JTextField();
+     inputPanel.add(saleQuantityField);
+     
+     JButton addToCartButton = new JButton("Add to Cart");
+     addToCartButton.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+     JButton clearCartButton = new JButton("Clear Cart");
+     clearCartButton.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+     JPanel buttonPanel = new JPanel();
+     buttonPanel.add(addToCartButton);
+     buttonPanel.add(clearCartButton);
+     inputPanel.add(buttonPanel);
+     
+     // Cart table
+     cartTableModel = new DefaultTableModel() {
+         @Override
+         public boolean isCellEditable(int row, int column) {
+             return false;
+         }
+     };
+     cartTableModel.addColumn("ID");
+     cartTableModel.addColumn("Name");
+     cartTableModel.addColumn("Price");
+     cartTableModel.addColumn("Quantity");
+     cartTableModel.addColumn("Subtotal");
+     
+     cartTable = new JTable(cartTableModel);
+     JScrollPane cartScrollPane = new JScrollPane(cartTable);
+     
+     // Total panel
+     JPanel totalPanel = new JPanel();
+     totalPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+     totalAmountLabel = new JLabel("Total: $0.00");
+     totalAmountLabel.setFont(new Font("Arial", Font.BOLD, 18));
+     JButton checkoutButton = new JButton("Checkout");
+     checkoutButton.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+     totalPanel.add(totalAmountLabel);
+     totalPanel.add(checkoutButton);
+     
+     // Bottom panel
+     JPanel bottomPanel = new JPanel();
+     bottomPanel.setLayout(new BorderLayout());
+     bottomPanel.add(totalPanel, BorderLayout.NORTH);
+     JButton backButton = new JButton("Back to Main Menu");
+     backButton.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
+     bottomPanel.add(backButton, BorderLayout.SOUTH);
+     
+     // Add components to panel
+     salesPanel.add(inputPanel, BorderLayout.NORTH);
+     salesPanel.add(cartScrollPane, BorderLayout.CENTER);
+     salesPanel.add(bottomPanel, BorderLayout.SOUTH);
+     
+     // Action listeners
+     addToCartButton.addActionListener(e -> addToCart());
+     clearCartButton.addActionListener(e -> clearCart());
+     checkoutButton.addActionListener(e -> checkout());
+     backButton.addActionListener(e -> {
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "main");
+     });
+ }
+ 
+ private void createReportPanel() {
+     reportPanel = new JPanel();
+     reportPanel.setLayout(new BorderLayout());
+     
+     JLabel titleLabel = new JLabel("Sales Reports", JLabel.CENTER);
+     titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+     reportPanel.add(titleLabel, BorderLayout.NORTH);
+     
+     // Create table model
+     DefaultTableModel reportTableModel = new DefaultTableModel() {
+         @Override
+         public boolean isCellEditable(int row, int column) {
+             return false;
+         }
+     };
+     reportTableModel.addColumn("Sale ID");
+     reportTableModel.addColumn("Product");
+     reportTableModel.addColumn("Quantity");
+     reportTableModel.addColumn("Total");
+     reportTableModel.addColumn("Date");
+     
+     // Create table
+     JTable reportTable = new JTable(reportTableModel);
+     JScrollPane scrollPane = new JScrollPane(reportTable);
+     reportPanel.add(scrollPane, BorderLayout.CENTER);
+     
+     // Back button
+     JButton backButton = new JButton("Back to Main Menu");
+     backButton.setFont(new Font("Lucida Grande", Font.BOLD, 18));
+     reportPanel.add(backButton, BorderLayout.SOUTH);
+     
+     // Action listeners
+     backButton.addActionListener(e -> {
+         CardLayout cl = (CardLayout) mainFrame.getContentPane().getLayout();
+         cl.show(mainFrame.getContentPane(), "main");
+     });
+ }
+ 
+ // Methods for product management
+ private void addProduct() {
+     try {
+         String id = productIdField.getText();
+         String name = productNameField.getText();
+         double price = Double.parseDouble(productPriceField.getText());
+         int quantity = Integer.parseInt(productQuantityField.getText());
+         
+         // Validate inputs
+         if (id.isEmpty() || name.isEmpty()) {
+             JOptionPane.showMessageDialog(mainFrame, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
+         
+         // Check if product already exists
+         for (Product product : products) {
+             if (product.getId().equals(id)) {
+                 JOptionPane.showMessageDialog(mainFrame, "Product ID already exists", "Error", JOptionPane.ERROR_MESSAGE);
+                 return;
+             }
+         }
+         
+         // Add new product
+         products.add(new Product(id, name, price, quantity));
+         updateProductTable();
+         clearProductFields();
+         JOptionPane.showMessageDialog(mainFrame, "Product added successfully");
+     } catch (NumberFormatException e) {
+         JOptionPane.showMessageDialog(mainFrame, "Please enter valid price and quantity", "Error", JOptionPane.ERROR_MESSAGE);
+     }
+ }
+ 
+ private void updateProduct() {
+     try {
+         String id = productIdField.getText();
+         String name = productNameField.getText();
+         double price = Double.parseDouble(productPriceField.getText());
+         int quantity = Integer.parseInt(productQuantityField.getText());
+         
+         // Validate inputs
+         if (id.isEmpty() || name.isEmpty()) {
+             JOptionPane.showMessageDialog(mainFrame, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
+         
+         // Find and update product
+         boolean found = false;
+         for (Product product : products) {
+             if (product.getId().equals(id)) {
+                 product.setName(name);
+                 product.setPrice(price);
+                 product.setQuantity(quantity);
+                 found = true;
+                 break;
+             }
+         }
+         
+         if (!found) {
+             JOptionPane.showMessageDialog(mainFrame, "Product not found", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
+         
+         updateProductTable();
+         clearProductFields();
+         JOptionPane.showMessageDialog(mainFrame, "Product updated successfully");
+     } catch (NumberFormatException e) {
+         JOptionPane.showMessageDialog(mainFrame, "Please enter valid price and quantity", "Error", JOptionPane.ERROR_MESSAGE);
+     }
+ }
+ 
+ private void deleteProduct() {
+     String id = productIdField.getText();
+     
+     if (id.isEmpty()) {
+         JOptionPane.showMessageDialog(mainFrame, "Please select a product to delete", "Error", JOptionPane.ERROR_MESSAGE);
+         return;
+     }
+     
+     // Find and delete product
+     Product productToRemove = null;
+     for (Product product : products) {
+         if (product.getId().equals(id)) {
+             productToRemove = product;
+             break;
+         }
+     }
+     
+     if (productToRemove == null) {
+         JOptionPane.showMessageDialog(mainFrame, "Product not found", "Error", JOptionPane.ERROR_MESSAGE);
+         return;
+     }
+     
+     products.remove(productToRemove);
+     updateProductTable();
+     clearProductFields();
+     JOptionPane.showMessageDialog(mainFrame, "Product deleted successfully");
+ }
+ 
+ private void clearProductFields() {
+     productIdField.setText("");
+     productNameField.setText("");
+     productPriceField.setText("");
+     productQuantityField.setText("");
+ }
+ 
+ private void updateProductTable() {
+     productTableModel.setRowCount(0);
+     for (Product product : products) {
+         productTableModel.addRow(new Object[]{
+             product.getId(),
+             product.getName(),
+             product.getPrice(),
+             product.getQuantity()
+         });
+     }
+ }
+ 
+ // Methods for inventory management
+ private void updateInventoryTable() {
+     DefaultTableModel model = (DefaultTableModel) ((JTable) ((JScrollPane) inventoryPanel.getComponent(1)).getViewport().getView()).getModel();
+     model.setRowCount(0);
+     
+     for (Product product : products) {
+         String status;
+         if (product.getQuantity() <= 0) {
+             status = "Out of stock";
+         } else if (product.getQuantity() < 10) {
+             status = "Low stock";
+         } else {
+             status = "In stock";
+         }
+         
+         model.addRow(new Object[]{
+             product.getId(),
+             product.getName(),
+             product.getQuantity(),
+             status
+         });
+     }
+ }
+ 
+ // Methods for sales management
+ private void addToCart() {
+     try {
+         String productId = saleProductIdField.getText();
+         int quantity = Integer.parseInt(saleQuantityField.getText());
+         
+         if (productId.isEmpty() || quantity <= 0) {
+             JOptionPane.showMessageDialog(mainFrame, "Please enter valid product ID and quantity", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
+         
+         // Find product
+         Product selectedProduct = null;
+         for (Product product : products) {
+             if (product.getId().equals(productId)) {
+                 selectedProduct = product;
+                 break;
+             }
+         }
+         
+         if (selectedProduct == null) {
+             JOptionPane.showMessageDialog(mainFrame, "Product not found", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
+         
+         // Check inventory
+         if (selectedProduct.getQuantity() < quantity) {
+             JOptionPane.showMessageDialog(mainFrame, "Not enough stock available", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
+         
+         // Calculate subtotal
+         double subtotal = selectedProduct.getPrice() * quantity;
+         
+         // Add to cart table
+         cartTableModel.addRow(new Object[]{
+             selectedProduct.getId(),
+             selectedProduct.getName(),
+             selectedProduct.getPrice(),
+             quantity,
+             subtotal
+         });
+         
+         // Update total
+         totalAmount += subtotal;
+         totalAmountLabel.setText(String.format("Total: $%.2f", totalAmount));
+         
+         // Clear input fields
+         saleProductIdField.setText("");
+         saleQuantityField.setText("");
+         
+     } catch (NumberFormatException e) {
+         JOptionPane.showMessageDialog(mainFrame, "Please enter a valid quantity", "Error", JOptionPane.ERROR_MESSAGE);
+     }
+ }
+ 
+ private void clearCart() {
+     cartTableModel.setRowCount(0);
+     totalAmount = 0.0;
+     totalAmountLabel.setText("Total: $0.00");
+ }
+ 
+ private void checkout() {
+     if (cartTableModel.getRowCount() == 0) {
+         JOptionPane.showMessageDialog(mainFrame, "Cart is empty", "Error", JOptionPane.ERROR_MESSAGE);
+         return;
+     }
+     
+     // Process sale
+     for (int i = 0; i < cartTableModel.getRowCount(); i++) {
+         String productId = cartTableModel.getValueAt(i, 0).toString();
+         int quantity = Integer.parseInt(cartTableModel.getValueAt(i, 3).toString());
+         double subtotal = Double.parseDouble(cartTableModel.getValueAt(i, 4).toString());
+         
+         // Update inventory
+         for (Product product : products) {
+             if (product.getId().equals(productId)) {
+                 product.setQuantity(product.getQuantity() - quantity);
+                 break;
+             }
+         }
+         
+         // Record sale
+         Sale sale = new Sale("S" + System.currentTimeMillis(), productId, quantity, subtotal, System.currentTimeMillis());
+         sales.add(sale);
+     }
+     
+     updateProductTable();
+     updateInventoryTable();
+     updateReportTable();
+     
+     JOptionPane.showMessageDialog(mainFrame, "Checkout completed successfully");
+     clearCart();
+ }
+ 
+ // Methods for report management
+ private void updateReportTable() {
+     DefaultTableModel model = (DefaultTableModel) ((JTable) ((JScrollPane) reportPanel.getComponent(1)).getViewport().getView()).getModel();
+     model.setRowCount(0);
+     
+     for (Sale sale : sales) {
+         model.addRow(new Object[]{
+             sale.getId(),
+             getProductNameById(sale.getProductId()),
+             sale.getQuantity(),
+             String.format("$%.2f", sale.getTotal()),
+             new java.util.Date(sale.getDate())
+         });
+     }
+ }
+ 
+ private String getProductNameById(String id) {
+     for (Product product : products) {
+         if (product.getId().equals(id)) {
+             return product.getName();
+         }
+     }
+     return "Unknown";
+ }
+ 
+ public static void main(String[] args) {
+     try {
+         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+     } catch (Exception e) {
+         e.printStackTrace();
+     }
+     
+     SwingUtilities.invokeLater(() -> {
+         new GroceryManagementProject();
+     });
+ }
+ 
+ // Model classes
+ class Product {
+     private String id;
+     private String name;
+     private double price;
+     private int quantity;
+     
+     public Product(String id, String name, double price, int quantity) {
+         this.id = id;
+         this.name = name;
+         this.price = price;
+         this.quantity = quantity;
+     }
+     
+     public String getId() { return id; }
+     public void setId(String id) { this.id = id; }
+     
+     public String getName() { return name; }
+     public void setName(String name) { this.name = name; }
+     
+     public double getPrice() { return price; }
+     public void setPrice(double price) { this.price = price; }
+     
+     public int getQuantity() { return quantity; }
+     public void setQuantity(int quantity) { this.quantity = quantity; }
+ }
+ 
+ class User {
+     private String username;
+     private String password;
+     private String role;
+     
+     public User(String username, String password, String role) {
+         this.username = username;
+         this.password = password;
+         this.role = role;
+     }
+     
+     public String getUsername() { return username; }
+     public String getPassword() { return password; }
+     public String getRole() { return role; }
+ }
+ 
+ class Sale {
+     private String id;
+     private String productId;
+     private int quantity;
+     private double total;
+     private long date;
+     
+     public Sale(String id, String productId, int quantity, double total, long date) {
+         this.id = id;
+         this.productId = productId;
+         this.quantity = quantity;
+         this.total = total;
+         this.date = date;
+     }
+     
+     public String getId() { return id; }
+     public String getProductId() { return productId; }
+     public int getQuantity() { return quantity; }
+     public double getTotal() { return total; }
+     public long getDate() { return date; }
+ }
+}
